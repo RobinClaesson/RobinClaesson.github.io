@@ -1,3 +1,21 @@
+////////////////////
+//    ELEMENTS    //
+////////////////////
+const canvas = document.getElementById("sorting-canvas");
+
+const button_selection = document.getElementById("button-selection");
+const button_insertion = document.getElementById("button-insertion");
+const button_quick = document.getElementById("button-quick");
+const button_test = document.getElementById("button-test");
+
+
+function disableButtons(disable) {
+    button_selection.disabled = disable;
+    button_insertion.disabled = disable;
+    button_quick.disabled = disable;
+    button_test.disabled = disable;
+}
+
 ////////////////
 //   COLORS   //
 ////////////////
@@ -7,9 +25,9 @@ var color_blue = "#0000FF";
 var color_red = "#FF0000";
 var color_yellow = "#FFD700";
 
-/////////////////
-//    TIMER    //
-/////////////////
+///////////////////
+//    TIMEOUT    //
+///////////////////
 var timeout;
 var delay;
 
@@ -34,8 +52,19 @@ function newList(length) {
     }
 }
 
+
+function drawList_promise() {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            drawList();
+            resolve('resolved');
+        }, delay);
+    });
+}
+
+//TODO: Rewrite this to be async 
 function drawList() {
-    var canvas = document.getElementById("sorting-canvas");
+
     var ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
@@ -63,77 +92,63 @@ function drawList() {
 ///////////////////////
 //   SELECTION SORT  //
 ///////////////////////
-function startSelectionSort() {
-    delay = 15;
-    clearTimeout(timeout);
 
+//TODO: Rewrite selection to make use of async await draw
+
+async function selectionSort_async() {
+    disableButtons(true);
     newList(50);
-    list[0][1] = color_yellow;
+    delay = 10;
 
-    selectionSort(0, 1, 0);
+    for (let i = 0; i < list.length - 1; i++) {
 
-}
+        var min = i;
+        list[i][1] = color_yellow;
 
-function selectionSort(i, j, min) {
+        //Find min
+        for (let j = i + 1; j < list.length; j++) {
 
-    //Reset last color
-    if (j - 1 != min && j - 1 != i)
-        list[j - 1][1] = color_default;
+            if (list[j][0] < list[min][0]) {
 
-    //Find smallest
-    if (j < list.length) {
+                if (min != i)
+                    list[min][1] = color_default;
 
-        if (list[j][0] < list[min][0]) {
+                min = j;
+                list[j][1] = color_blue;
 
-            list[j][1] = color_blue;
+                await drawList_promise();
+            }
 
-            if (min != i)
-                list[min][1] = color_default;
-
-            min = j;
+            else {
+                list[j][1] = color_red;
+                await drawList_promise();
+                list[j][1] = color_default;
+            }
         }
 
-        else
-            list[j][1] = color_red;
+        //Swap min and i
+        list[i][1] = color_default;
+        list[min][1] = color_green;
 
-        timeout = setTimeout(selectionSort, delay, i, j + 1, min);
+        var temp = list[min];
+        list[min] = list[i];
+        list[i] = temp;
     }
 
-    //Smallest found
-    else {
+    //Last one is ok when all other is
+    list[list.length - 1][1] = color_green;
 
-        if (i != min) {
-            list[i][1] = color_default;
-            list[min][1] = color_default;
+    //Draw final results
+    await drawList_promise();
+    disableButtons(false);
 
-            var temp = list[i];
-            list[i] = list[min];
-            list[min] = temp;
-
-        }
-
-        list[i][1] = color_green;
-
-
-
-        //Continiue suorting
-        if (i < list.length - 2) {
-            list[i + 1][1] = color_yellow;
-            timeout = setTimeout(selectionSort, delay, i + 1, i + 2, i + 1);
-        }
-
-        //Done sorting
-        else
-            list[i + 1][1] = color_green;
-
-    }
-
-    drawList();
 }
 
 //////////////////////////
 //    INSERTION SORT    //
 //////////////////////////
+//TODO: Rewrite insertion to make use of async await draw
+
 
 function startInsertionSort() {
     delay = 15;
@@ -174,6 +189,7 @@ function insertionSort(i, j) {
 ////////////////////
 //   QUICK SORT   //
 ////////////////////
+//TODO: Rewrite quick to make use of async await draw
 
 function startQuickSort() {
     updates = 0;
