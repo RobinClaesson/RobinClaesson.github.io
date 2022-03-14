@@ -1,12 +1,22 @@
+////////////////
+//   COLORS   //
+////////////////
 var color_default = "#FFE4C4";
 var color_green = "#00FF00";
 var color_blue = "#0000FF";
 var color_red = "#FF0000";
 var color_yellow = "#FFD700";
 
+/////////////////
+//    TIMER    //
+/////////////////
+var timer;
+var delay;
 
-var timer = Nan;
-var delay = 50;
+
+///////////////
+//   LISTS   //
+///////////////
 
 function newList(length) {
     list = [];
@@ -43,20 +53,18 @@ function drawList(list) {
     }
 }
 
-function resetTimer() {
-    if (timer != NaN)
-        clearTimeout(timer);
-}
-
-// SELECTION SORT
+///////////////////////
+//   SELECTION SORT  //
+///////////////////////
 function startSelectionSort() {
-
-    resetTimer();
+    delay = 15;
+    clearTimeout(timer);
 
     var list = newList(50);
     list[0][1] = color_yellow;
 
     selectionSort(list, 0, 1, 0);
+
 }
 
 function selectionSort(list, i, j, min) {
@@ -98,13 +106,61 @@ function selectionSort(list, i, j, min) {
 
         list[i][1] = color_green;
 
+
+
         //Continiue suorting
-        if (i < list.length - 1)
+        if (i < list.length - 2) {
+            list[i + 1][1] = color_yellow;
             timer = setTimeout(selectionSort, delay, list, i + 1, i + 2, i + 1);
+        }
+
+        //Done sorting
+        else
+            list[i + 1][1] = color_green;
+
     }
 
     drawList(list);
 }
 
+//////////////////////////
+//    INSERTION SORT    //
+//////////////////////////
+
+function startInsertionSort() {
+    delay = 15;
+    clearTimeout(timer);
+
+    list = newList(50);
+    list[1][1] = color_yellow;
+
+    insertionSort(list, 1, 1);
+}
+function insertionSort(list, i, j) {
+
+    // Step back through the array while the previous element is larger than the current
+    if (j > 0 && list[j][0] < list[j - 1][0]) {
+        var temp = list[j];
+        list[j] = list[j - 1];
+        list[j - 1] = temp;
+
+        timer = setTimeout(insertionSort, delay, list, i, j - 1);
+    }
+
+    // Start on next current
+    else if (i < list.length - 1) {
+        list[j][1] = color_default;
+        list[i + 1][1] = color_yellow;
+
+        timer = setTimeout(insertionSort, delay, list, i + 1, i + 1);
+    }
+
+    else
+        for (let i = 0; i < list.length; i++)
+            list[i][1] = color_green;
+
+
+    drawList(list);
+}
 
 
