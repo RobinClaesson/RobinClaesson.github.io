@@ -93,9 +93,7 @@ function drawList() {
 //   SELECTION SORT  //
 ///////////////////////
 
-//TODO: Rewrite selection to make use of async await draw
-
-async function selectionSort_async() {
+async function selectionSort() {
     disableButtons(true);
     newList(50);
     delay = 10;
