@@ -54,9 +54,9 @@ function drawList() {
         ctx.stroke();
     }
 
-    ctx.fillStyle = "#000000";
-    ctx.font = "30px Arial";
-    ctx.fillText(updates++, 10, 50);
+    // ctx.fillStyle = "#000000";
+    // ctx.font = "30px Arial";
+    // ctx.fillText(updates++, 10, 50);
 
 }
 
