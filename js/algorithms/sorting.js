@@ -186,8 +186,6 @@ function startQuickSort() {
 }
 
 function quicksort(start, end) {
-    console.log("start: " + start + " | end: " + end);
-
     if (start > end)
         return;
 
@@ -198,8 +196,6 @@ function quicksort(start, end) {
 }
 
 function quicksort_partition(start, end, left, right, foundLeft, foundRight) {
-    // console.log("start:" + start + " | end:" + end + " | left:" + left + " | right:" + right + " | foundLeft:" + foundLeft + " | foundRight:" + foundRight);
-
     // Finds elements on the left larger than the partition element
     if (left <= right) {
         if (!foundLeft) {
