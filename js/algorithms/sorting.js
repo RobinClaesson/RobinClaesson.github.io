@@ -145,43 +145,39 @@ async function selectionSort() {
 //////////////////////////
 //    INSERTION SORT    //
 //////////////////////////
-//TODO: Rewrite insertion to make use of async await draw
 
-
-function startInsertionSort() {
-    delay = 15;
-    clearTimeout(timeout);
-
+async function insertionSort() {
+    disableButtons(true);
     newList(50);
-    list[1][1] = color_yellow;
+    delay = 10;
 
-    insertionSort(1, 1);
-}
-function insertionSort(i, j) {
+    // Step forwards through the array
+    for (let i = 1; i < list.length; i++) {
+        var j = i;
 
-    // Step back through the array while the previous element is larger than the current
-    if (j > 0 && list[j][0] < list[j - 1][0]) {
-        var temp = list[j];
-        list[j] = list[j - 1];
-        list[j - 1] = temp;
+        list[j][1] = color_yellow;
+        await drawList_promise();
 
-        timeout = setTimeout(insertionSort, delay, i, j - 1);
-    }
+        // Step back through the array while the previous element is larger than the current
+        while (j > 0 && list[j - 1][0] > list[j][0]) {
+            var temp = list[j];
+            list[j] = list[j - 1];
+            list[j - 1] = temp;
 
-    // Start on next current
-    else if (i < list.length - 1) {
+            j--;
+
+            await drawList_promise();
+        }
+
         list[j][1] = color_default;
-        list[i + 1][1] = color_yellow;
-
-        timeout = setTimeout(insertionSort, delay, i + 1, i + 1);
     }
 
-    else
-        for (let i = 0; i < list.length; i++)
-            list[i][1] = color_green;
+    for (let i = 0; i < list.length; i++) 
+        list[i][1] = color_green;
 
 
-    drawList();
+    await drawList_promise();
+    disableButtons(false);
 }
 
 ////////////////////
