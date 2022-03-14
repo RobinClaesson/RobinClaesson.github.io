@@ -10,7 +10,7 @@ var color_yellow = "#FFD700";
 /////////////////
 //    TIMER    //
 /////////////////
-var timer;
+var timeout;
 var delay;
 
 
@@ -18,6 +18,9 @@ var delay;
 //   LISTS   //
 ///////////////
 
+var updates = 0;
+
+var list;
 function newList(length) {
     list = [];
     for (let i = 0; i < length; i++)
@@ -29,10 +32,9 @@ function newList(length) {
         list[i] = list[swap];
         list[swap] = temp;
     }
-    return list;
 }
 
-function drawList(list) {
+function drawList() {
     var canvas = document.getElementById("sorting-canvas");
     var ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
@@ -51,6 +53,11 @@ function drawList(list) {
         ctx.rect(x, y, item_width, h);
         ctx.stroke();
     }
+
+    ctx.fillStyle = "#000000";
+    ctx.font = "30px Arial";
+    ctx.fillText(updates++, 10, 50);
+
 }
 
 ///////////////////////
@@ -58,16 +65,16 @@ function drawList(list) {
 ///////////////////////
 function startSelectionSort() {
     delay = 15;
-    clearTimeout(timer);
+    clearTimeout(timeout);
 
-    var list = newList(50);
+    newList(50);
     list[0][1] = color_yellow;
 
-    selectionSort(list, 0, 1, 0);
+    selectionSort(0, 1, 0);
 
 }
 
-function selectionSort(list, i, j, min) {
+function selectionSort(i, j, min) {
 
     //Reset last color
     if (j - 1 != min && j - 1 != i)
@@ -82,13 +89,14 @@ function selectionSort(list, i, j, min) {
 
             if (min != i)
                 list[min][1] = color_default;
+
             min = j;
         }
 
         else
             list[j][1] = color_red;
 
-        timer = setTimeout(selectionSort, delay, list, i, j + 1, min);
+        timeout = setTimeout(selectionSort, delay, i, j + 1, min);
     }
 
     //Smallest found
@@ -111,7 +119,7 @@ function selectionSort(list, i, j, min) {
         //Continiue suorting
         if (i < list.length - 2) {
             list[i + 1][1] = color_yellow;
-            timer = setTimeout(selectionSort, delay, list, i + 1, i + 2, i + 1);
+            timeout = setTimeout(selectionSort, delay, i + 1, i + 2, i + 1);
         }
 
         //Done sorting
@@ -120,7 +128,7 @@ function selectionSort(list, i, j, min) {
 
     }
 
-    drawList(list);
+    drawList();
 }
 
 //////////////////////////
@@ -129,14 +137,14 @@ function selectionSort(list, i, j, min) {
 
 function startInsertionSort() {
     delay = 15;
-    clearTimeout(timer);
+    clearTimeout(timeout);
 
-    list = newList(50);
+    newList(50);
     list[1][1] = color_yellow;
 
-    insertionSort(list, 1, 1);
+    insertionSort(1, 1);
 }
-function insertionSort(list, i, j) {
+function insertionSort(i, j) {
 
     // Step back through the array while the previous element is larger than the current
     if (j > 0 && list[j][0] < list[j - 1][0]) {
@@ -144,7 +152,7 @@ function insertionSort(list, i, j) {
         list[j] = list[j - 1];
         list[j - 1] = temp;
 
-        timer = setTimeout(insertionSort, delay, list, i, j - 1);
+        timeout = setTimeout(insertionSort, delay, i, j - 1);
     }
 
     // Start on next current
@@ -152,7 +160,7 @@ function insertionSort(list, i, j) {
         list[j][1] = color_default;
         list[i + 1][1] = color_yellow;
 
-        timer = setTimeout(insertionSort, delay, list, i + 1, i + 1);
+        timeout = setTimeout(insertionSort, delay, i + 1, i + 1);
     }
 
     else
@@ -160,7 +168,116 @@ function insertionSort(list, i, j) {
             list[i][1] = color_green;
 
 
-    drawList(list);
+    drawList();
 }
+
+////////////////////
+//   QUICK SORT   //
+////////////////////
+
+function startQuickSort() {
+    updates = 0;
+    delay = 40;
+    clearTimeout(timeout);
+
+    newList(50);
+
+    quicksort(0, list.length - 1)
+}
+
+function quicksort(start, end) {
+    console.log("start: " + start + " | end: " + end);
+
+    if (start > end)
+        return;
+
+
+    list[start][1] = color_yellow;
+    quicksort_partition(start, end, start, end + 1, false, false)
+
+}
+
+function quicksort_partition(start, end, left, right, foundLeft, foundRight) {
+    // console.log("start:" + start + " | end:" + end + " | left:" + left + " | right:" + right + " | foundLeft:" + foundLeft + " | foundRight:" + foundRight);
+
+    // Finds elements on the left larger than the partition element
+    if (left <= right) {
+        if (!foundLeft) {
+            if (left > start)
+                list[left][1] = color_default;
+
+            left++;
+
+
+            if (left < end && list[left][0] < list[start][0]) {
+                list[left][1] = color_red;
+                timeout = setTimeout(quicksort_partition, delay, start, end, left, right, false, false);
+            }
+            else {
+                if (left <= end)
+                    list[left][1] = color_blue;
+
+                timeout = setTimeout(quicksort_partition, delay, start, end, left, right, true, false);
+            }
+
+        }
+
+        // Finds elements on the right smaller than the partition element
+        else if (!foundRight) {
+
+            if (right <= end)
+                list[right][1] = color_default;
+
+            right--;
+
+            if (right != start && list[start][0] < list[right][0]) {
+                list[right][1] = color_red;
+                timeout = setTimeout(quicksort_partition, delay, start, end, left, right, true, false);
+            }
+
+            else {
+                list[right][1] = color_blue;
+                timeout = setTimeout(quicksort_partition, delay, start, end, left, right, true, true);
+            }
+        }
+
+        // Swap the larger and smaller element
+        else {
+            if (left < right) {
+                var temp = list[left];
+                list[left] = list[right];
+                list[right] = temp;
+            }
+
+            timeout = setTimeout(quicksort_partition, delay, start, end, left, right, false, false);
+        }
+    }
+
+    // Swap the partition element with the last small element to place it inbetween
+    // the two partitions
+    else {
+        list[start][1] = color_green;
+
+        if (right != start)
+            list[right][1] = color_default;
+
+        var temp = list[start];
+        list[start] = list[right];
+        list[right] = temp;
+
+
+        //Sort left partition
+        timeout = setTimeout(quicksort, delay, start, right - 1);
+
+        //TODO: Make this wait for the left partition
+        //Sort right parition
+        timeout = setTimeout(quicksort, delay, right + 1, end);
+
+    }
+
+
+    drawList();
+}
+
 
 
