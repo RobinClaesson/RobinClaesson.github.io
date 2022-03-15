@@ -25,11 +25,45 @@ var color_blue = "#0000FF";
 var color_red = "#FF0000";
 var color_yellow = "#FFD700";
 
-///////////////////
-//    TIMEOUT    //
-///////////////////
-var timeout;
-var delay;
+/////////////////
+//    DELAY    //
+/////////////////
+
+var delays = [1000, 700, 500, 300, 150, 75, 50, 30, 20, 10]
+var speedText = document.getElementById("sorting-speed");
+var delay = delays[getCurrentSortingSpeed()];
+
+function getCurrentSortingSpeed() {
+    return parseInt(speedText.textContent.split(' ')[2]) - 1;
+}
+
+//Increase animation speed
+function sortingSpeedUp() {
+
+    var speed = getCurrentSortingSpeed();
+
+    if (speed < 9) {
+        speed++;
+        delay = delays[speed];
+
+        speedText.textContent = "Animation Speed: " + (speed + 1);
+    }
+
+}
+
+//Decrease animation speed 
+function sortingSpeedDown() {
+
+    var speed = getCurrentSortingSpeed();
+
+    if (speed > 0) {
+        speed--;
+        delay = delays[speed];
+
+        speedText.textContent = "Animation Speed: " + (speed + 1);
+    }
+
+}
 
 
 ///////////////
@@ -53,7 +87,7 @@ function newList(length) {
 }
 
 
-function drawList_promise() {
+function drawList_delay() {
     return new Promise(resolve => {
         setTimeout(() => {
             drawList();
@@ -96,7 +130,7 @@ function drawList() {
 async function selectionSort() {
     disableButtons(true);
     newList(50);
-    delay = 10;
+    drawList();
 
     for (let i = 0; i < list.length - 1; i++) {
 
@@ -114,12 +148,12 @@ async function selectionSort() {
                 min = j;
                 list[j][1] = color_blue;
 
-                await drawList_promise();
+                await drawList_delay();
             }
 
             else {
                 list[j][1] = color_red;
-                await drawList_promise();
+                await drawList_delay();
                 list[j][1] = color_default;
             }
         }
@@ -137,7 +171,7 @@ async function selectionSort() {
     list[list.length - 1][1] = color_green;
 
     //Draw final results
-    await drawList_promise();
+    await drawList_delay();
     disableButtons(false);
 
 }
@@ -149,14 +183,14 @@ async function selectionSort() {
 async function insertionSort() {
     disableButtons(true);
     newList(50);
-    delay = 10;
+    drawList();
 
     // Step forwards through the list
     for (let i = 1; i < list.length; i++) {
         var j = i;
 
         list[j][1] = color_yellow;
-        await drawList_promise();
+        await drawList_delay();
 
         // Step back through the list while the previous element is larger than the current
         while (j > 0 && list[j - 1][0] > list[j][0]) {
@@ -166,7 +200,7 @@ async function insertionSort() {
 
             j--;
 
-            await drawList_promise();
+            await drawList_delay();
         }
 
         list[j][1] = color_default;
@@ -176,7 +210,7 @@ async function insertionSort() {
         list[i][1] = color_green;
 
 
-    await drawList_promise();
+    await drawList_delay();
     disableButtons(false);
 }
 
@@ -187,11 +221,11 @@ async function insertionSort() {
 async function quickSort() {
     disableButtons(true);
     newList(50);
-    delay = 20;
+    drawList();
 
     await quickSort_sort(0, list.length - 1);
 
-    await drawList_promise();
+    await drawList_delay();
     disableButtons(false);
 }
 
@@ -200,7 +234,7 @@ async function quickSort_sort(start, end) {
     // Return if there is only one or fewer elements
     if (start == end) {
         list[start][1] = color_green;
-        await drawList_promise();
+        await drawList_delay();
         return;
     }
 
@@ -212,7 +246,7 @@ async function quickSort_sort(start, end) {
     var pElement = await quickSort_partition(start, end);
 
     list[pElement][1] = color_green;
-    await drawList_promise();
+    await drawList_delay();
 
     // Sort the two partitions
     await quickSort_sort(start, pElement - 1);
@@ -227,7 +261,7 @@ async function quickSort_sort(start, end) {
 async function quickSort_partition(start, end) {
 
     list[start][1] = color_yellow;
-    await drawList_promise();
+    await drawList_delay();
 
     var temp;
 
@@ -242,21 +276,21 @@ async function quickSort_partition(start, end) {
             left++;
 
             list[left][1] = color_red;
-            await drawList_promise();
+            await drawList_delay();
             list[left][1] = color_default;
 
 
         } while (list[left][0] < list[start][0] && left != end);
 
         list[left][1] = color_blue;
-        await drawList_promise();
+        await drawList_delay();
 
         // Finds elements on the right smaller than the partition element
         do {
             right--;
 
             list[right][1] = color_red;
-            await drawList_promise();
+            await drawList_delay();
             list[right][1] = color_default;
         } while (list[start][0] < list[right][0] && right != start);
 
@@ -291,12 +325,13 @@ var auxList;
 async function mergeSort() {
     disableButtons(true);
     newList(50);
-    delay = 30;
+    drawList();
+
     auxList = [];
 
     await mergeSort_sort(0, list.length - 1);
 
-    await drawList_promise();
+    await drawList_delay();
     disableButtons(false);
 }
 
@@ -330,13 +365,13 @@ async function mergeSort_merge(start, end, middle) {
     for (let i = start; i <= end; i++) {
         auxList[i] = list[i][0];
         list[i][1] = color_red;
-        await drawList_promise();
+        await drawList_delay();
     }
 
     //Pure animation, nothing with the algoritm
     for (let i = start; i <= end; i++) {
         list[i][0] = 0;
-        await drawList_promise();
+        await drawList_delay();
 
         if (start == 0 && end == list.length - 1)
             list[i][1] = color_green;
@@ -368,7 +403,7 @@ async function mergeSort_merge(start, end, middle) {
             list[i][0] = auxList[left++];
 
 
-        await drawList_promise();
+        await drawList_delay();
     }
 
     //Pure animation, nothing with the algoritm

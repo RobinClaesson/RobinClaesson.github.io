@@ -46,16 +46,33 @@
     <!-- Sorting algorithms -->
     <section id="sorting" class="first-section">
         <div class="container">
-            <div class="row">
-                <h2>Sorting Algorithms</h2>
+            <h2>Sorting Algorithms</h2>
+            <canvas id="sorting-canvas" width="800" height="500" class="canvas-program"></canvas>
 
-                <canvas id="sorting-canvas" width="800" height="500" class="canvas-program"></canvas>
-                <p>&nbsp;</p>
+            <div class="row">
                 <div class="column4">
-                    <button type="button" id="button-selection" onclick="selectionSort()">Selection Sort</button>
+                    <h3 id="sorting-speed" >Animation Speed: 7</h3>
                 </div>
                 <div class="column4">
+                </div>
+                <div class="column4">
+                    <button type="button" id="button-selection" onclick="selectionSort()">Selection Sort</button>
+
+                </div>
+
+                <div class="column4">
                     <button type="button" id="button-insertion" onclick="insertionSort()">Insertion Sort</button>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="column4">
+                    <button type="button" id="button-sorting-faster" onclick="sortingSpeedUp()">Faster</button>
+                    <button type="button" id="button-sorting-slower" onclick="sortingSpeedDown()">Slower</button>
+                </div>
+                <div class="column4">
+
                 </div>
                 <div class="column4">
                     <button type="button" id="button-quick" onclick="quickSort()">Quick Sort</button>
@@ -64,10 +81,7 @@
                 <div class="column4">
                     <button type="button" id="button-merge" onclick="mergeSort()">Merge Sort</button>
                 </div>
-                
-                <p>&nbsp;</p>
             </div>
-        </div>
         </div>
     </section>
 
