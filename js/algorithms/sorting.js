@@ -6,12 +6,14 @@ const canvas = document.getElementById("sorting-canvas");
 const button_selection = document.getElementById("button-selection");
 const button_insertion = document.getElementById("button-insertion");
 const button_quick = document.getElementById("button-quick");
+const button_merge = document.getElementById("button-merge");
 
 
 function disableButtons(disable) {
     button_selection.disabled = disable;
     button_insertion.disabled = disable;
     button_quick.disabled = disable;
+    button_merge.disabled = disable;
 }
 
 ////////////////
@@ -181,8 +183,6 @@ async function insertionSort() {
 ////////////////////
 //   QUICK SORT   //
 ////////////////////
-//TODO: Rewrite quick to make use of async await draw
-
 
 async function quickSort() {
     disableButtons(true);
@@ -218,6 +218,7 @@ async function quickSort_sort(start, end) {
     await quickSort_sort(start, pElement - 1);
     await quickSort_sort(pElement + 1, end);
 
+    //Lets us use await on the recursive calls
     return new Promise(resolve => {
         resolve('resolved');
     });
@@ -282,7 +283,105 @@ async function quickSort_partition(start, end) {
     });
 }
 
+////////////////////
+//   MERGE SORT   //
+////////////////////
 
+var auxList;
+async function mergeSort() {
+    disableButtons(true);
+    newList(50);
+    delay = 30;
+    auxList = [];
+
+    await mergeSort_sort(0, list.length - 1);
+
+    await drawList_promise();
+    disableButtons(false);
+}
+
+async function mergeSort_sort(start, end) {
+
+    // We are down to one element (base case)
+    if (start >= end)
+        return;
+
+    // Callculate the middle of start and end
+    var middle = Math.floor(start + (end - start) / 2);
+
+    // Sort the two halves
+    await mergeSort_sort(start, middle);
+    await mergeSort_sort(middle + 1, end);
+
+    // Merge the two halves
+    await mergeSort_merge(start, end, middle);
+
+
+    //Lets us use await on the recursive calls
+    return new Promise(resolve => {
+        resolve('resolved');
+    });
+
+}
+
+async function mergeSort_merge(start, end, middle) {
+
+    // Copy to aux
+    for (let i = start; i <= end; i++) {
+        auxList[i] = list[i][0];
+        list[i][1] = color_red;
+        await drawList_promise();
+    }
+
+    //Pure animation, nothing with the algoritm
+    for (let i = start; i <= end; i++) {
+        list[i][0] = 0;
+        await drawList_promise();
+
+        if (start == 0 && end == list.length - 1)
+            list[i][1] = color_green;
+        else
+            list[i][1] = color_blue;
+    }
+
+    // Merge left and right half
+    var left = start;
+    var right = middle + 1;
+
+    // Go through all the elements we are suppose to merge
+    for (let i = start; i <= end; i++) {
+
+        // We have merged all the left elements, take next right
+        if (left > middle)
+            list[i][0] = auxList[right++];
+
+        // We have merged all the right elemets, take next left
+        else if (right > end)
+            list[i][0] = auxList[left++];
+
+        // Right element is smaller than left element, take right
+        else if (auxList[right] < auxList[left])
+            list[i][0] = auxList[right++];
+
+        // Left element is smaller or equal to right element, take left
+        else
+            list[i][0] = auxList[left++];
+
+
+        await drawList_promise();
+    }
+
+    //Pure animation, nothing with the algoritm
+    if (start != 0 || end != list.length - 1)
+        for (let i = start; i <= end; i++) {
+            list[i][1] = color_default;
+        }
+
+    //Lets us use await on the recursive calls
+    return new Promise(resolve => {
+        resolve('resolved');
+    });
+}
 
 
 
