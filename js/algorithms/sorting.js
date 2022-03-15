@@ -6,14 +6,12 @@ const canvas = document.getElementById("sorting-canvas");
 const button_selection = document.getElementById("button-selection");
 const button_insertion = document.getElementById("button-insertion");
 const button_quick = document.getElementById("button-quick");
-const button_test = document.getElementById("button-test");
 
 
 function disableButtons(disable) {
     button_selection.disabled = disable;
     button_insertion.disabled = disable;
     button_quick.disabled = disable;
-    button_test.disabled = disable;
 }
 
 ////////////////
@@ -151,14 +149,14 @@ async function insertionSort() {
     newList(50);
     delay = 10;
 
-    // Step forwards through the array
+    // Step forwards through the list
     for (let i = 1; i < list.length; i++) {
         var j = i;
 
         list[j][1] = color_yellow;
         await drawList_promise();
 
-        // Step back through the array while the previous element is larger than the current
+        // Step back through the list while the previous element is larger than the current
         while (j > 0 && list[j - 1][0] > list[j][0]) {
             var temp = list[j];
             list[j] = list[j - 1];
@@ -172,7 +170,7 @@ async function insertionSort() {
         list[j][1] = color_default;
     }
 
-    for (let i = 0; i < list.length; i++) 
+    for (let i = 0; i < list.length; i++)
         list[i][1] = color_green;
 
 
@@ -185,105 +183,108 @@ async function insertionSort() {
 ////////////////////
 //TODO: Rewrite quick to make use of async await draw
 
-function startQuickSort() {
-    updates = 0;
-    delay = 40;
-    clearTimeout(timeout);
 
+async function quickSort() {
+    disableButtons(true);
     newList(50);
+    delay = 20;
 
-    quicksort(0, list.length - 1)
+    await quickSort_sort(0, list.length - 1);
+
+    await drawList_promise();
+    disableButtons(false);
 }
 
-function quicksort(start, end) {
+async function quickSort_sort(start, end) {
+
+    // Return if there is only one or fewer elements
+    if (start == end) {
+        list[start][1] = color_green;
+        await drawList_promise();
+        return;
+    }
+
     if (start > end)
         return;
 
+    // Split the list into two partitions around one partitions element
+    // and gets the index of that element
+    var pElement = await quickSort_partition(start, end);
 
-    list[start][1] = color_yellow;
-    quicksort_partition(start, end, start, end + 1, false, false)
+    list[pElement][1] = color_green;
+    await drawList_promise();
 
+    // Sort the two partitions
+    await quickSort_sort(start, pElement - 1);
+    await quickSort_sort(pElement + 1, end);
+
+    return new Promise(resolve => {
+        resolve('resolved');
+    });
 }
 
-function quicksort_partition(start, end, left, right, foundLeft, foundRight) {
-    // Finds elements on the left larger than the partition element
-    if (left <= right) {
-        if (!foundLeft) {
-            if (left > start)
-                list[left][1] = color_default;
+async function quickSort_partition(start, end) {
 
+    list[start][1] = color_yellow;
+    await drawList_promise();
+
+    var temp;
+
+    // This sets the first element in the list as the partition element
+    var left = start;
+    var right = end + 1;
+
+    while (left < right) {
+
+        // Finds elements on the left larger than the partition element
+        do {
             left++;
 
+            list[left][1] = color_red;
+            await drawList_promise();
+            list[left][1] = color_default;
 
-            if (left < end && list[left][0] < list[start][0]) {
-                list[left][1] = color_red;
-                timeout = setTimeout(quicksort_partition, delay, start, end, left, right, false, false);
-            }
-            else {
-                if (left <= end)
-                    list[left][1] = color_blue;
 
-                timeout = setTimeout(quicksort_partition, delay, start, end, left, right, true, false);
-            }
+        } while (list[left][0] < list[start][0] && left != end);
 
-        }
+        list[left][1] = color_blue;
+        await drawList_promise();
 
         // Finds elements on the right smaller than the partition element
-        else if (!foundRight) {
-
-            if (right <= end)
-                list[right][1] = color_default;
-
+        do {
             right--;
 
-            if (right != start && list[start][0] < list[right][0]) {
-                list[right][1] = color_red;
-                timeout = setTimeout(quicksort_partition, delay, start, end, left, right, true, false);
-            }
-
-            else {
-                list[right][1] = color_blue;
-                timeout = setTimeout(quicksort_partition, delay, start, end, left, right, true, true);
-            }
-        }
+            list[right][1] = color_red;
+            await drawList_promise();
+            list[right][1] = color_default;
+        } while (list[start][0] < list[right][0] && right != start);
 
         // Swap the larger and smaller element
-        else {
-            if (left < right) {
-                var temp = list[left];
-                list[left] = list[right];
-                list[right] = temp;
-            }
-
-            timeout = setTimeout(quicksort_partition, delay, start, end, left, right, false, false);
+        if (left < right) {
+            temp = list[left];
+            list[left] = list[right];
+            list[right] = temp;
         }
+
+        list[left][1] = color_default;
+        list[right][1] = color_default;
     }
 
     // Swap the partition element with the last small element to place it inbetween
     // the two partitions
-    else {
-        list[start][1] = color_green;
+    temp = list[start];
+    list[start] = list[right];
+    list[right] = temp;
 
-        if (right != start)
-            list[right][1] = color_default;
-
-        var temp = list[start];
-        list[start] = list[right];
-        list[right] = temp;
-
-
-        //Sort left partition
-        timeout = setTimeout(quicksort, delay, start, right - 1);
-
-        //TODO: Make this wait for the left partition
-        //Sort right parition
-        timeout = setTimeout(quicksort, delay, right + 1, end);
-
-    }
-
-
-    drawList();
+    //Return the index of the partition element
+    return new Promise(resolve => {
+        resolve(right);
+    });
 }
+
+
+
+
 
 
 
