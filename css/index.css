@@ -27,3 +27,13 @@
     display: table;
     clear: both;
   }
+
+  H2 { 
+    text-align: center;
+    color: #EE6940; 
+  }
+
+  H3 {
+    text-align: center;
+    color: #EE6940; 
+  }

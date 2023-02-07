@@ -78,27 +78,4 @@ html {
     color: #000;
 }
 
-a:link {
-    color: #1F1F1A;
-    background-color: transparent;
-    text-decoration: none;
-  }
-  
-  a:visited {
-    color: #5C5D4E;
-    background-color: transparent;
-    text-decoration: none;
-  }
-  
-  a:hover {
-    color: #1F1F1A;
-    background-color: transparent;
-    text-decoration: underline;
-  }
-  
-  a:active {
-    color: #5C5D4E;
-    background-color: transparent;
-    text-decoration: underline;
-  }
 
